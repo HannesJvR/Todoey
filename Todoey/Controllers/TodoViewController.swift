@@ -31,15 +31,6 @@ class TodoViewController: UITableViewController {
         print(dataFilePath ?? "dataFilePath was not available") //default value
         
         loadItems()
-        
-//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-//            itemsArray = items
-//            print("itemsArray use TodoListArray in defaults")
-//        } else {
-//            print("TodoListArray using hardcoded items")
-//        }
-        
-        
     }
     
     //MARK - Tableview Datasource Methods
@@ -52,13 +43,6 @@ class TodoViewController: UITableViewController {
         
         print("Setting cell values (using cellForRowAt)")
         cell.textLabel?.text = itemsArray[indexPath.row].title
-        
-//        if itemsArray[indexPath.row].done {
-//            cell.accessoryType = .checkmark
-//        } else {
-//            cell.accessoryType = .none
-//        }
-        
         cell.accessoryType = itemsArray[indexPath.row].done ? .checkmark : .none
         
         return cell
@@ -69,18 +53,7 @@ class TodoViewController: UITableViewController {
         print(itemsArray[indexPath.row])
         
         itemsArray[indexPath.row].done = !(itemsArray[indexPath.row].done) //Toggle the done value
-//        context.delete(itemsArray[indexPath.row])
-//        itemsArray.remove(at: indexPath.row)
-        
-        
         saveItems() //save item.done that was changed
-        
-// Now being set as part of override func tableView based on itemsArray values
-//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none // remove checkmark for cell
-//        } else {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark // show checkmark for cell
-//        }
         
         tableView.deselectRow(at: indexPath, animated: true) // show selected row only briefly
     }
@@ -97,16 +70,10 @@ class TodoViewController: UITableViewController {
             print("Success!")
             print(textField.text ?? "default value if textField.text is nil")
             
-            //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-            // At runtime UIApplication = live app object
-            // AppDelegate can access the objects of AppDelegate.swift file
-            
             let newItem = Item(context: self.context)
             newItem.title = textField.text! //mandatory field as per DB
             newItem.done = false //mandatory field as per DB
             self.itemsArray.append(newItem)
-
-            //self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
             self.saveItems()
         }
         
@@ -166,8 +133,6 @@ extension TodoViewController: UISearchBarDelegate {
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] //this array may contain multiple sort descriptors
         
         loadItems(with: request)
-        
-        //tableView.reloadData() //Already part of loadItems
     }
     
 
