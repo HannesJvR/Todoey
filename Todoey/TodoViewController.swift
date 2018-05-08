@@ -11,10 +11,21 @@ import UIKit
 class TodoViewController: UITableViewController {
     
     var itemsArray = ["Cell 1","Cell 2","Cell 3"]
+    
+    let defaults = UserDefaults.standard
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        //defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemsArray = items
+            print("itemsArray use TodoListArray in defaults")
+        } else {
+            print("TodoListArray using hardcoded items")
+        }
+        
+        
     }
     
     //MARK - Tableview Datasource Methods
@@ -53,15 +64,20 @@ class TodoViewController: UITableViewController {
             print("Success!")
             print(textField.text ?? "default value if textField.text is nil")
             self.itemsArray.append(textField.text!)
+
+            self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
+            print("saved the updated itemsArray to TodoListArray in defaults")
+
             self.tableView.reloadData() //refresh tableview from itemsArray
         }
+        
         
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
             textField = alertTextField
             print("textfield added to alert")
         }
-    
+        
         alert.addAction(action)
         
         present(alert, animated: true, completion: nil)
