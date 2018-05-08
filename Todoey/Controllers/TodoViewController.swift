@@ -148,6 +148,34 @@ class TodoViewController: UITableViewController {
         }
         
      }
+    
+}
+
+//MARK: - Search bar methods
+// using extension for delegate functions helps to modularise the code
+// UITableViewController can be handled in a similar way
+extension TodoViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        //this replace %@ with searchBar.text when running query against DB
+        //[cd] indicates it is not case sensitive or diacretic sensitive
+        
+        request.predicate = predicate
+        
+        let sortDescriptr = NSSortDescriptor(key: "title", ascending: true)
+        
+        request.sortDescriptors = [sortDescriptr] //this array may contain multiple sort descriptors
+        
+        do {
+            itemsArray = try context.fetch(request) //Returns an array
+        } catch {
+            print ("Error fetchin data from context, \(error)")
+        }
+        
+        tableView.reloadData()
+    }
+    
 
 }
 
