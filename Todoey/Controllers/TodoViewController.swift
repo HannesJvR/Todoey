@@ -23,7 +23,7 @@ class TodoViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        print(dataFilePath)
+        print(dataFilePath ?? "dataFilePath was not available") //default value
         
         loadItems()
         
