@@ -13,11 +13,18 @@ class TodoViewController: UITableViewController {
     //var itemsArray = ["Cell 1","Cell 2","Cell 3"]
     var itemsArray = [Item]()
     
-    let defaults = UserDefaults.standard
+    //let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    //look in .userDomainMask (user's home directory - personal items assosiated with this app)
+    //this is an array - .first picks the first item in the array
+    //.appendingPathComponent("Items.plist") just creates path - not the file
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        
+        print(dataFilePath)
         
         let newItem = Item()
         newItem.title = "Find Mike"
@@ -32,12 +39,12 @@ class TodoViewController: UITableViewController {
         itemsArray.append(newItem3)
         
 
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemsArray = items
-            print("itemsArray use TodoListArray in defaults")
-        } else {
-            print("TodoListArray using hardcoded items")
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//            itemsArray = items
+//            print("itemsArray use TodoListArray in defaults")
+//        } else {
+//            print("TodoListArray using hardcoded items")
+//        }
         
         
     }
@@ -98,7 +105,15 @@ class TodoViewController: UITableViewController {
             newItem.title = textField.text!
             self.itemsArray.append(newItem)
 
-            self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
+            //self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
+            let encoder = PropertyListEncoder()
+            do {
+                let data = try encoder.encode(self.itemsArray)
+                try data.write(to: self.dataFilePath!)
+            } catch {
+                print ("Error encoding item array, \(error)")
+            }
+            
             print("saved the updated itemsArray to TodoListArray in defaults")
 
             self.tableView.reloadData() //refresh tableview from itemsArray
@@ -115,6 +130,8 @@ class TodoViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
     }
+    
+
 
 
 }
