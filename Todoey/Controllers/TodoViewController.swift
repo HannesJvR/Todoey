@@ -68,7 +68,11 @@ class TodoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(itemsArray[indexPath.row])
         
-        itemsArray[indexPath.row].done = !(itemsArray[indexPath.row].done) //Toggle the done value
+        //itemsArray[indexPath.row].done = !(itemsArray[indexPath.row].done) //Toggle the done value
+        context.delete(itemsArray[indexPath.row])
+        itemsArray.remove(at: indexPath.row)
+        
+        
         saveItems() //save item.done that was changed
         
 // Now being set as part of override func tableView based on itemsArray values
