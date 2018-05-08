@@ -30,7 +30,7 @@ class TodoViewController: UITableViewController {
         
         print(dataFilePath ?? "dataFilePath was not available") //default value
         
-//        loadItems()
+        loadItems()
         
 //        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
 //            itemsArray = items
@@ -134,16 +134,16 @@ class TodoViewController: UITableViewController {
 
     }
 
-//    func loadItems() {
-//        if let data = try? Data(contentsOf: dataFilePath!){
-//            let decoder = PropertyListDecoder()
-//            do {
-//                itemsArray = try decoder.decode([Item].self, from: data)
-//            } catch {
-//                print ("Error decoding item array, \(error)")
-//            }
-//        }
-//    }
+    func loadItems() {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        //NSFetchRequest<Item> specifies the datatype of the output - in this case Item
+        do {
+            itemsArray = try context.fetch(request) //Returns an array
+        } catch {
+            print ("Error fetchin data from context, \(error)")
+        }
+        
+     }
 
 }
 
