@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Item: Encodable { //To be encodable all properties need to use standard data types (no custom classes)
+class Item: Codable { //To be Codable all properties need to use standard data types (no custom classes) - Codable means Encodable + Decodable
     var title : String = ""
     var done : Bool = false
 }

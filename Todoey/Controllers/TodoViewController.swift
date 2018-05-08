@@ -23,22 +23,10 @@ class TodoViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        
         print(dataFilePath)
         
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemsArray.append(newItem)
+        loadItems()
         
-        let newItem2 = Item()
-        newItem2.title = "Buy Eggs"
-        itemsArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Destroy Demogoron"
-        itemsArray.append(newItem3)
-        
-
 //        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
 //            itemsArray = items
 //            print("itemsArray use TodoListArray in defaults")
@@ -105,7 +93,7 @@ class TodoViewController: UITableViewController {
             self.itemsArray.append(newItem)
 
             //self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
-            saveItems()
+            self.saveItems()
         }
         
         
@@ -124,7 +112,7 @@ class TodoViewController: UITableViewController {
     func saveItems() {
         let encoder = PropertyListEncoder()
         do {
-            let data = try encoder.encode(sitemsArray)
+            let data = try encoder.encode(itemsArray)
             try data.write(to: dataFilePath!)
         } catch {
             print ("Error encoding item array, \(error)")
@@ -137,6 +125,16 @@ class TodoViewController: UITableViewController {
 
     }
 
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!){
+            let decoder = PropertyListDecoder()
+            do {
+                itemsArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print ("Error decoding item array, \(error)")
+            }
+        }
+    }
 
 }
 
