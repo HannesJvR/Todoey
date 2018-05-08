@@ -7,11 +7,16 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoViewController: UITableViewController {
     
     //var itemsArray = ["Cell 1","Cell 2","Cell 3"]
     var itemsArray = [Item]()
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    // At runtime UIApplication = live app object
+    // AppDelegate can access the objects of AppDelegate.swift file
     
     //let defaults = UserDefaults.standard
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
@@ -25,7 +30,7 @@ class TodoViewController: UITableViewController {
         
         print(dataFilePath ?? "dataFilePath was not available") //default value
         
-        loadItems()
+//        loadItems()
         
 //        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
 //            itemsArray = items
@@ -88,8 +93,13 @@ class TodoViewController: UITableViewController {
             print("Success!")
             print(textField.text ?? "default value if textField.text is nil")
             
-            let newItem = Item()
-            newItem.title = textField.text!
+            //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            // At runtime UIApplication = live app object
+            // AppDelegate can access the objects of AppDelegate.swift file
+            
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text! //mandatory field as per DB
+            newItem.done = false //mandatory field as per DB
             self.itemsArray.append(newItem)
 
             //self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
@@ -110,12 +120,11 @@ class TodoViewController: UITableViewController {
     
     //MARK - Model Manipulation Methods
     func saveItems() {
-        let encoder = PropertyListEncoder()
         do {
-            let data = try encoder.encode(itemsArray)
-            try data.write(to: dataFilePath!)
+            let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+            try context.save()
         } catch {
-            print ("Error encoding item array, \(error)")
+            print ("Error saving context, \(error)")
         }
         
         print("saved the updated itemsArray to TodoListArray in defaults")
@@ -125,16 +134,16 @@ class TodoViewController: UITableViewController {
 
     }
 
-    func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!){
-            let decoder = PropertyListDecoder()
-            do {
-                itemsArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print ("Error decoding item array, \(error)")
-            }
-        }
-    }
+//    func loadItems() {
+//        if let data = try? Data(contentsOf: dataFilePath!){
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemsArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print ("Error decoding item array, \(error)")
+//            }
+//        }
+//    }
 
 }
 
