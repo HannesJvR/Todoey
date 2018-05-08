@@ -76,9 +76,8 @@ class TodoViewController: UITableViewController {
         print(itemsArray[indexPath.row])
         
         itemsArray[indexPath.row].done = !(itemsArray[indexPath.row].done) //Toggle the done value
+        saveItems() //save item.done that was changed
         
-        tableView.reloadData() //cause tableView(.., cellForRowAt ..) to run again
-
 // Now being set as part of override func tableView based on itemsArray values
 //        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
 //            tableView.cellForRow(at: indexPath)?.accessoryType = .none // remove checkmark for cell
@@ -106,17 +105,7 @@ class TodoViewController: UITableViewController {
             self.itemsArray.append(newItem)
 
             //self.defaults.set(self.itemsArray, forKey: "TodoListArray") //save the updated itemsArray to defaults (UserDefaults)
-            let encoder = PropertyListEncoder()
-            do {
-                let data = try encoder.encode(self.itemsArray)
-                try data.write(to: self.dataFilePath!)
-            } catch {
-                print ("Error encoding item array, \(error)")
-            }
-            
-            print("saved the updated itemsArray to TodoListArray in defaults")
-
-            self.tableView.reloadData() //refresh tableview from itemsArray
+            saveItems()
         }
         
         
@@ -131,7 +120,22 @@ class TodoViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    //MARK - Model Manipulation Methods
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(sitemsArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print ("Error encoding item array, \(error)")
+        }
+        
+        print("saved the updated itemsArray to TodoListArray in defaults")
+        
+        tableView.reloadData() //refresh tableview from itemsArray
+        //cause tableView(.., cellForRowAt ..) to run again
 
+    }
 
 
 }
