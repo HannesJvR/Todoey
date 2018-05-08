@@ -138,9 +138,11 @@ class TodoViewController: UITableViewController {
 
     }
 
-    func loadItems() {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        //NSFetchRequest<Item> specifies the datatype of the output - in this case Item
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+        //request = name of paramenter used internal to loadItems
+        //with = name of parameter used by code calling loadItems
+        //Item.fetchRequest() = default used when no request is specified by calling code
+        
         do {
             itemsArray = try context.fetch(request) //Returns an array
         } catch {
@@ -157,23 +159,15 @@ class TodoViewController: UITableViewController {
 extension TodoViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let request : NSFetchRequest<Item> = Item.fetchRequest()
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         //this replace %@ with searchBar.text when running query against DB
         //[cd] indicates it is not case sensitive or diacretic sensitive
         
-        request.predicate = predicate
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] //this array may contain multiple sort descriptors
         
-        let sortDescriptr = NSSortDescriptor(key: "title", ascending: true)
+        loadItems(with: request)
         
-        request.sortDescriptors = [sortDescriptr] //this array may contain multiple sort descriptors
-        
-        do {
-            itemsArray = try context.fetch(request) //Returns an array
-        } catch {
-            print ("Error fetchin data from context, \(error)")
-        }
-        
-        tableView.reloadData()
+        //tableView.reloadData() //Already part of loadItems
     }
     
 
