@@ -40,6 +40,8 @@ class TodoViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        //This creates a reusable cell and adds it to the table at the indexpath
+        //"ToDoItemCell" is the ID of prototype cell on TodoViewController
         
         print("Setting cell values (using cellForRowAt)")
         cell.textLabel?.text = itemsArray[indexPath.row].title
@@ -98,7 +100,7 @@ class TodoViewController: UITableViewController {
             print ("Error saving context, \(error)")
         }
         
-        print("saved the updated itemsArray to TodoListArray in defaults")
+        print("saved the updated itemsArray")
         
         tableView.reloadData() //refresh tableview from itemsArray
         //cause tableView(.., cellForRowAt ..) to run again
@@ -135,6 +137,16 @@ extension TodoViewController: UISearchBarDelegate {
         loadItems(with: request)
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            //searchBar.text?.count = length of search text
+            loadItems()
+            
+            DispatchQueue.main.async { //Grab the main execution thread
+                searchBar.resignFirstResponder() //return to status before searchBar was activated
+            }
+        }
+    }
 
 }
 
