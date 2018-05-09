@@ -11,6 +11,15 @@ import CoreData
 
 class TodoViewController: UITableViewController {
     
+    var selectedCategory : Category? {
+        didSet{ //is triggered when a value for selectedCategory is set
+            print("Category \(selectedCategory!.name ?? "<none>") was detected by TodoViewController.")
+            loadItems()
+        }
+    }
+    //Optional because it will be nil until segue is performed
+    //This is set by delegate method in CategoryViewController
+    
     //var itemsArray = ["Cell 1","Cell 2","Cell 3"]
     var itemsArray = [Item]()
     
@@ -29,8 +38,6 @@ class TodoViewController: UITableViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         print(dataFilePath ?? "dataFilePath was not available") //default value
-        
-        loadItems()
     }
     
     //MARK - Tableview Datasource Methods
@@ -75,6 +82,7 @@ class TodoViewController: UITableViewController {
             let newItem = Item(context: self.context)
             newItem.title = textField.text! //mandatory field as per DB
             newItem.done = false //mandatory field as per DB
+            newItem.parentCategory = self.selectedCategory
             self.itemsArray.append(newItem)
             self.saveItems()
         }
@@ -107,16 +115,28 @@ class TodoViewController: UITableViewController {
 
     }
 
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil ) {
         //request = name of paramenter used internal to loadItems
         //with = name of parameter used by code calling loadItems
         //Item.fetchRequest() = default used when no request is specified by calling code
+        //predicate is second parameter set as optional with nil as default
+        
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory!.name!))
+        
+        if let addionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate,addionalPredicate]) //use 2 predicates if predicate parameter is specified (for search criteria)
+            print("request.predicate = <\(request.predicate!)>")
+        } else {
+            request.predicate = categoryPredicate //use 1 predicate
+        }
         
         do {
             itemsArray = try context.fetch(request) //Returns an array
         } catch {
             print ("Error fetchin data from context, \(error)")
         }
+        
+        tableView.reloadData()
         
      }
     
@@ -127,17 +147,21 @@ class TodoViewController: UITableViewController {
 // UITableViewController can be handled in a similar way
 extension TodoViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print("searchBar.text = <\(searchBar.text!)>")
         let request : NSFetchRequest<Item> = Item.fetchRequest()
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let searchPredicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         //this replace %@ with searchBar.text when running query against DB
         //[cd] indicates it is not case sensitive or diacretic sensitive
         
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] //this array may contain multiple sort descriptors
         
-        loadItems(with: request)
+        print("searchPredicate = <\(searchPredicate)>")
+        loadItems(with: request, predicate: searchPredicate)
+        print("Completed execution of loadItems")
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        //This return screen to the state before the search funtionality was called
         if searchBar.text?.count == 0 {
             //searchBar.text?.count = length of search text
             loadItems()
