@@ -55,11 +55,12 @@ class TodoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(itemResults![indexPath.row])
         
-        print("Updating done indicator...")
+        print("Deleting item ...")
         if let item = itemResults?[indexPath.row]{
             do {
                 try realm.write {
-                    item.done = !item.done
+                    //item.done = !item.done
+                    realm.delete(item)
                 }
             } catch {
                 print("Error saving done status, \(error)")
