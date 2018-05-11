@@ -55,12 +55,11 @@ class TodoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(itemResults![indexPath.row])
         
-        print("Deleting item ...")
         if let item = itemResults?[indexPath.row]{
             do {
                 try realm.write {
-                    //item.done = !item.done
-                    realm.delete(item)
+                    item.done = !item.done
+                    //realm.delete(item)
                 }
             } catch {
                 print("Error saving done status, \(error)")
@@ -148,16 +147,9 @@ class TodoViewController: UITableViewController {
 extension TodoViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         print("searchBar.text = <\(searchBar.text!)>")
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-//        let searchPredicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//        //this replace %@ with searchBar.text when running query against DB
-//        //[cd] indicates it is not case sensitive or diacretic sensitive
-//
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] //this array may contain multiple sort descriptors
-//
-//        print("searchPredicate = <\(searchPredicate)>")
-//        loadItems(with: request, predicate: searchPredicate)
-        print("Completed execution of loadItems")
+        itemResults = itemResults?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+        
+        tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
