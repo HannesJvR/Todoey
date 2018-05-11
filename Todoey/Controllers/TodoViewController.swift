@@ -90,9 +90,13 @@ class TodoViewController: UITableViewController {
                     try self.realm.write {
                         let newItem = Item()
                         newItem.title = textField.text! //mandatory field as per DB
-                        //newItem.done = false //default already set as part of Data Model
-                        //newItem.parentCategory = self.selectedCategory
-                        //self.itemResults.append(newItem)
+                        let myDate = Date()
+                        let myFormatter = DateFormatter()
+                        myFormatter.dateFormat = "yyyy.MM.dd"
+                        let result = myFormatter.string(from: myDate)
+                        print("Create date: \(result)")
+                        
+                        newItem.dateCreated = myDate
                         currentCategory.items.append(newItem)
                         //self.saveItems()
                     }
@@ -147,7 +151,7 @@ class TodoViewController: UITableViewController {
 extension TodoViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         print("searchBar.text = <\(searchBar.text!)>")
-        itemResults = itemResults?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+        itemResults = itemResults?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: false) //false = most recent at the top
         
         tableView.reloadData()
     }
